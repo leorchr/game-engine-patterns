@@ -18,6 +18,7 @@ unique_ptr<IGame>&& gameP) noexcept
         render::BeginDraw();
         render::ClearScreen();
         game->Draw();
+        DrawFPS(50, 50);
         render::EndDraw();
     }
     game->Unload();
