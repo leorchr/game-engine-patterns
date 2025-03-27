@@ -1,16 +1,12 @@
 #include "SceneGame.h"
-
-#include <iostream>
-
 #include "AssetsManager.h"
-
 #include "raylib.h"
-#include "raymath.h"
+#include <random>
 
 SceneGame::SceneGame(shared_ptr<ECSManager> ecsRef, Game& game)
 : ecs {std::move( ecsRef )}, game { game }
 {
-
+    srand(time(0));
 }
 
 void SceneGame::Load() {
@@ -30,13 +26,20 @@ void SceneGame::Load() {
 
 
     Transform2D& playerTransform = ecs->CreateTransform2DComponent(player);
-    playerTransform.pos = Vector2{ 0.0f, 0.0f };
+    playerTransform.pos = Vector2{ 100.0f, 100.0f };
 
     ecs->CreateInputComponent(player);
 
+    {
+        int x = AssetsManager::GetTexture("Ship").width;
+        int y = AssetsManager::GetTexture("Ship").height;
+        auto playerBox = Rectangle( static_cast<float>(x),static_cast<float>(y));
+        ecs->CreateRigidbody2DComponent(player, playerTransform.pos, playerBox);
+    }
 
-    int x = AssetsManager::GetTexture("Ship").width;
-    int y = AssetsManager::GetTexture("Ship").height;
+
+    int x = AssetsManager::GetTexture("Astroid").width;
+    int y = AssetsManager::GetTexture("Astroid").height;
     auto astroidBox = Rectangle( static_cast<float>(x),static_cast<float>(y));
 
     for (size_t i = 0; i < 20; i++)
@@ -44,10 +47,21 @@ void SceneGame::Load() {
         u64 astroid = ecs->CreateEntity();
         ecs->CreateSpriteComponent(astroid, "Astroid");
         Transform2D& astroidTransform = ecs->CreateTransform2DComponent(astroid);
-        astroidTransform.pos = Vector2{ 0.0f, 0.0f };
+
+
+        float randomX = rand() % GetScreenWidth();
+        float randomY = rand() % GetScreenHeight();
+
+        astroidTransform.pos = Vector2{ randomX, randomY };
+
+        int randomRot = rand() % 361;
+        astroidTransform.rotation = randomRot;
+
         Rigidbody2D& astroidRigidbody = ecs->CreateRigidbody2DComponent(astroid, astroidTransform.pos, astroidBox);
 
-        astroidRigidbody.velocity = Vector2{ 50.0f, 50.0f };
+        float randomVelocityX = 0 + (rand() % (1 - 0 + 1)) == 1 ? -1.f : 1.f ;
+        float randomVelocityY = 0 + (rand() % (1 - 0 + 1)) == 1 ? -1.f : 1.f ;
+        astroidRigidbody.velocity = Vector2{ 50.0f * randomVelocityX, 50.0f* randomVelocityY };
     }
 }
 

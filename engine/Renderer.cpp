@@ -16,6 +16,6 @@ namespace render {
         ::DrawTexture(texture, x, y, tint);
     }
     void DrawSprite(Texture texture2D, Rectangle srcRect, Rectangle dstRect, float rotation, Color tint) {
-        ::DrawTexturePro(texture2D, srcRect, dstRect, { 0, 0 }, rotation, tint);
+        ::DrawTexturePro(texture2D, srcRect, dstRect, { texture2D.width/2.0f, texture2D.height/2.0f }, rotation, tint);
     }
 }

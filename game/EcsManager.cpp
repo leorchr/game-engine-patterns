@@ -1,14 +1,12 @@
 #include "EcsManager.h"
-
-#include <iostream>
-
 #include "GMath.h"
 
 u64 ECSManager::maxId = 0;
 
 void ECSManager::UpdateScene(f32 dt) {
-    SystemPhysicsUpdate(dt);
+    SystemWrapper();
     SystemInputs(dt);
+    SystemPhysicsUpdate(dt);
 }
 
 void ECSManager::DrawScene() {
@@ -73,29 +71,59 @@ void ECSManager::SystemSpriteDraw() {
 #endif
 }
 
+void ECSManager::SystemWrapper()
+{
+    for (auto& transform : transforms)
+    {
+        if (transform.pos.x > GetScreenWidth())
+        {
+            transform.pos.x = 0;
+            auto& rigidbody = GetComponent<Rigidbody2D>(transform.entityId);
+            rigidbody.pos = transform.pos;
+        }
+        else if (transform.pos.y > GetScreenHeight())
+        {
+            transform.pos.y = 0;
+            auto& rigidbody = GetComponent<Rigidbody2D>(transform.entityId);
+            rigidbody.pos = transform.pos;
+        }
+        else if (transform.pos.x < 0.f)
+        {
+            transform.pos.x = GetScreenWidth();
+            auto& rigidbody = GetComponent<Rigidbody2D>(transform.entityId);
+            rigidbody.pos = transform.pos;
+        }
+        else if (transform.pos.y < 0.f)
+        {
+            transform.pos.y = GetScreenHeight();
+            auto& rigidbody = GetComponent<Rigidbody2D>(transform.entityId);
+            rigidbody.pos = transform.pos;
+        }
+    }
+}
+
 void ECSManager::SystemInputs(float dt)
 {
-    for (auto input : inputs)
+    for (auto& input : inputs)
     {
         auto& transform = GetComponent<Transform2D>(input.entityId);
 
-        if (IsKeyDown(KEY_A))
-        {
-            transform.rotation++;
-        }
-
         if (IsKeyDown(KEY_D))
         {
-            transform.rotation--;
+            transform.rotation+= 200 * dt;
         }
 
-        std::cout << transform.rotation << std::endl;
-        if (IsKeyDown(KEY_Z))
+        if (IsKeyDown(KEY_A))
         {
-            const float speed = 200.0f;
-            Vector2 localDirection = { 0.f, -1.f };
+            transform.rotation-=200 * dt;
+        }
 
-            float angleRad = transform.rotation * 360 / PI;
+        if (IsKeyDown(KEY_W))
+        {
+            const float speed = 250.0f;
+            Vector2 localDirection = { 1.f, 0.f };
+
+            float angleRad = transform.rotation * DEG2RAD;
 
             Vector2 globalDirection = {
                 localDirection.x * cos(angleRad) - localDirection.y * sin(angleRad),

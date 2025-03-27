@@ -10,7 +10,6 @@ unique_ptr<IGame>&& gameP) noexcept
     gameName = gameNameP;
     game = std::move(gameP);
     Window window { windowWidth, windowHeight, gameName };
-    SetTargetFPS(60);
     game->Load();
     while (!Window::ShouldClose())
     {
@@ -19,7 +18,6 @@ unique_ptr<IGame>&& gameP) noexcept
         render::BeginDraw();
         render::ClearScreen();
         game->Draw();
-        DrawFPS(50, 50);
         render::EndDraw();
     }
     game->Unload();

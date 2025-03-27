@@ -51,6 +51,7 @@ private:
     void CleanRemovedEntities();
     void SystemPhysicsUpdate(f32 dt);
     void SystemSpriteDraw();
+    void SystemWrapper();
     void SystemInputs(float dt);
     template<class T>
     void RemoveComponent(vector<T>& components, Entity& removedEntity, ComponentIndex componentTypeIndex) {
